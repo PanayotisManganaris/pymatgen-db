@@ -83,6 +83,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         update_duplicates=True,
         mapi_key=None,
         use_full_uri=True,
+
         runs=None,
     ):
         """Constructor.
@@ -168,10 +169,12 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.use_full_uri = use_full_uri
         self.runs = runs or ["relax1", "relax2"]
         if not simulate_mode:
-            conn = MongoClient(self.host, self.port)
+            conn = MongoClient(self.host, self.port, 
+                               username=self.user,
+                               password=self.password,
+                               authSource=self.database,
+                               authMechanism='SCRAM-SHA-1')
             db = conn[self.database]
-            if self.user:
-                db.authenticate(self.user, self.password)
             if db.counter.count_documents({"_id": "taskid"}) == 0:
                 db.counter.insert_one({"_id": "taskid", "c": 1})
 
@@ -256,10 +259,12 @@ class VaspToDbTaskDrone(AbstractDrone):
             # Perform actual insertion into db. Because db connections cannot
             # be pickled, every insertion needs to create a new connection
             # to the db.
-            conn = MongoClient(self.host, self.port)
+            conn = MongoClient(self.host, self.port, 
+                               username=self.user,
+                               password=self.password,
+                               authSource=self.database,
+                               authMechanism='SCRAM-SHA-1')
             db = conn[self.database]
-            if self.user:
-                db.authenticate(self.user, self.password)
             coll = db[self.collection]
 
             # Insert dos data into gridfs and then remove it from the dict.
