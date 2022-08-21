@@ -23,11 +23,11 @@ from pymongo import MongoClient, ASCENDING
 
 from pymatgen.apps.borg.queen import BorgQueen
 
-from matgendb import SETTINGS
-from matgendb.query_engine import QueryEngine
-from matgendb.creator import VaspToDbTaskDrone
-from matgendb.dbconfig import DBConfig
-from matgendb.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
+from pymatgen.db import SETTINGS
+from pymatgen.db.query_engine import QueryEngine
+from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.config import DBConfig
+from pymatgen.db.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
 
 _log = logging.getLogger("mg")  # parent
 
@@ -207,7 +207,7 @@ def db_stats(args):
 
     # Copy stat args and keywords.
     stats, kw = {}, {}
-    for k, v in vars(args).iteritems():
+    for k, v in vars(args).items():
         if k.startswith("st_"):
             stats[k[3:]] = v
         else:
@@ -215,7 +215,7 @@ def db_stats(args):
 
     # Process 'show all'.
     if stats['showall']:
-        for k in stats.iterkeys():
+        for k in stats.keys():
             stats[k] = True
     del stats['showall']
 
@@ -225,7 +225,7 @@ def db_stats(args):
     # Run commands.
     cmd = StatsCommands(qe, **kw)
     w.write(cmd.header())
-    for k in stats.iterkeys():
+    for k in stats.keys():
         if stats[k]:
             w.write(cmd.stat(k))
 
