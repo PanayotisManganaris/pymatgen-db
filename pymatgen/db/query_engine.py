@@ -136,14 +136,20 @@ class QueryEngine:
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
-                self.connection = pymongo.MongoClient(self.host, self.port, replicaset=self.replicaset)
+                self.connection = pymongo.MongoClient(self.host, self.port, replicaset=self.replicaset,
+                                                      username=user,
+                                                      password=password,
+                                                      authSource=database,
+                                                      authMechanism='SCRAM-SHA-1')
             else:
-                self.connection = pymongo.MongoClient(self.host, self.port)
+                self.connection = pymongo.MongoClient(self.host, self.port,
+                                                      username=user,
+                                                      password=password,
+                                                      authSource=database,
+                                                      authMechanism='SCRAM-SHA-1')
         else:
             self.connection = connection
         self.db = self.connection[database]
-        if user:
-            self.db.authenticate(user, password)
         self.collection_name = collection
         self.set_aliases_and_defaults(aliases_config=aliases_config, default_properties=default_properties)
         # Post-processing functions
